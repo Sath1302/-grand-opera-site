@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notre carte — Le Grand Opéra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;800&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <a href="index.html" class="logo">Le Grand<span> Opéra</span></a>
+    <div class="navlinks">
+      <a href="index.html">Accueil</a>
+      <a href="carte.html" class="active">Notre carte</a>
+      <a href="apropos.html">L'établissement</a>
+      <a href="equipe.html">Notre équipe</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <a href="contact.html" class="navcta">Nous trouver</a>
+  </nav>
+</header>
+
+<section class="page-hero">
+  <div class="page-hero-bg"><img src="assets/patisseries-5.png" alt="Vitrine de pâtisserie du Grand Opéra"></div>
+  <div class="wrap">
+    <div class="eyebrow">La carte</div>
+    <h1>Notre carte</h1>
+    <p class="lead">Pains, pâtisseries et sandwichs à emporter. Prix relevés en vitrine. La carte brasserie complète (plats, boissons) est disponible sur place.</p>
+  </div>
+</section>
+
+<section class="products" style="padding-top:70px;">
+  <div class="wrap">
+    <div class="filters" id="filters"></div>
+    <div class="grid4" id="product-grid"></div>
+    <p class="data-note">Les produits sont générés à partir d'une structure de données JS partagée entre les pages (<code>js/products.js</code> : tableau d'objets nom / catégorie / prix / image). Cette architecture sépare les données de l'affichage, comme le ferait une base de données, tout en restant compatible avec un hébergement statique (GitHub Pages).</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo">Le Grand Opéra</div>
+    <div class="footlinks">
+      <a href="carte.html">Carte</a>
+      <a href="apropos.html">L'établissement</a>
+      <a href="equipe.html">Équipe</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div>© 2026 — 13 Rue de Mogador, 75009 Paris</div>
+  </div>
+</footer>
+
+<script src="js/products.js"></script>
+<script>
+  initProductGrid('filters', 'product-grid');
+</script>
+</body>
+</html>
