@@ -42,7 +42,10 @@
       <a href="galerie.html">Galerie</a>
       <a href="contact.html">Contact</a>
     </div>
-    <span id="nav-auth-slot"></span>
+    <div class="nav-right">
+      <a href="panier.html" class="cart-link"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-badge" id="cart-badge">0</span></a>
+      <span id="nav-auth-slot"></span>
+    </div>
   </nav>
 </header>
 
@@ -124,6 +127,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
 <script src="js/auth.js"></script>
+<script src="js/cart.js"></script>
 <script>
   // Bascule entre les onglets Connexion / Créer un compte
   document.querySelectorAll('.auth-tab').forEach(tab => {

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon panier — Le Grand Opéra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;800&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .cart-wrap{max-width:720px; margin:0 auto; padding:70px 28px 100px;}
+  .demo-banner{
+    background:rgba(200,155,60,0.12); border:1px solid rgba(200,155,60,0.35);
+    border-radius:6px; padding:14px 18px; font-size:13px; color:var(--croute);
+    margin-bottom:32px; display:flex; gap:10px; align-items:flex-start;
+  }
+  .demo-banner svg{width:18px; height:18px; flex-shrink:0; margin-top:1px; stroke:var(--ble);}
+  .cart-line{
+    display:flex; align-items:center; gap:16px; padding:18px 0; border-bottom:1px solid var(--line);
+  }
+  .cart-line img{width:64px; height:64px; border-radius:5px; object-fit:cover; flex-shrink:0;}
+  .cart-line-info{flex:1;}
+  .cart-line-info h3{text-transform:none; font-family:'Newsreader',serif; font-style:italic; font-weight:500; font-size:17px;}
+  .cart-line-info .unit-price{font-size:12.5px; color:rgba(43,29,20,0.55); margin-top:2px;}
+  .qty-control{display:flex; align-items:center; gap:10px;}
+  .qty-btn{
+    width:28px; height:28px; border-radius:50%; border:1px solid var(--line); background:var(--mie);
+    font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .qty-val{font-family:'Big Shoulders Display'; font-size:16px; min-width:18px; text-align:center;}
+  .line-total{font-family:'Big Shoulders Display'; font-size:18px; color:var(--confiture); min-width:70px; text-align:right;}
+  .remove-btn{color:rgba(43,29,20,0.35); font-size:12px; cursor:pointer; margin-left:8px;}
+  .cart-summary{margin-top:24px; padding-top:20px; border-top:2px solid var(--croute);}
+  .summary-row{display:flex; justify-content:space-between; font-size:15px; margin-bottom:8px;}
+  .summary-row.total{font-family:'Big Shoulders Display'; font-size:24px; margin-top:14px;}
+  .empty-cart{text-align:center; padding:60px 20px; color:rgba(43,29,20,0.5);}
+  .checkout-form{margin-top:36px; display:none;}
+  .checkout-form.open{display:block;}
+  .success-box{display:none; text-align:center; padding:50px 20px;}
+  .success-box.open{display:block;}
+  .success-box .check{
+    width:64px; height:64px; border-radius:50%; background:var(--confiture); color:var(--mie);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:30px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <a href="index.html" class="logo">Le Grand<span> Opéra</span></a>
+    <div class="navlinks">
+      <a href="index.html">Accueil</a>
+      <a href="carte.html">Notre carte</a>
+      <a href="apropos.html">L'établissement</a>
+      <a href="equipe.html">Notre équipe</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="nav-right">
+      <a href="panier.html" class="cart-link"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-badge" id="cart-badge">0</span></a>
+      <span id="nav-auth-slot"></span>
+    </div>
+  </nav>
+</header>
+
+<section class="page-hero" style="padding-bottom:0;">
+  <div class="page-hero-bg"><img src="assets/sandwichs-vitrine.png" alt="Vitrine du Grand Opéra"></div>
+  <div class="wrap">
+    <div class="eyebrow">Récapitulatif</div>
+    <h1>Mon panier</h1>
+  </div>
+</section>
+
+<div class="cart-wrap">
+
+  <div class="demo-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
+    <div>Ceci est une commande de démonstration réalisée dans le cadre d'un projet de stage. Aucun paiement réel n'est effectué et aucune commande n'est transmise à l'établissement.</div>
+  </div>
+
+  <div id="cart-content"></div>
+
+  <div class="checkout-form" id="checkout-form">
+    <h2 style="font-size:22px; text-transform:none; font-family:'Newsreader',serif; font-style:italic; font-weight:500; margin-bottom:16px;">Retrait en boutique</h2>
+    <div class="field">
+      <label for="pickup-name">Nom</label>
+      <input type="text" id="pickup-name" required style="width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:5px; font-family:'Work Sans'; font-size:15px;">
+    </div>
+    <div class="field" style="margin-top:14px;">
+      <label for="pickup-time">Heure de retrait souhaitée</label>
+      <input type="time" id="pickup-time" required style="width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:5px; font-family:'Work Sans'; font-size:15px;">
+    </div>
+    <button class="btn-primary" id="confirm-order" style="width:100%; margin-top:22px; background:var(--confiture); color:var(--mie);">Confirmer la commande (démo)</button>
+  </div>
+
+  <div class="success-box" id="success-box">
+    <div class="check">✓</div>
+    <h2 style="font-size:26px; text-transform:none; font-family:'Newsreader',serif; font-style:italic; font-weight:500;">Commande simulée confirmée</h2>
+    <p style="margin-top:10px; color:rgba(43,29,20,0.65);">Numéro de démonstration : <strong id="order-number"></strong></p>
+    <p style="margin-top:6px; font-size:13px; color:rgba(43,29,20,0.5);">Rappel : ceci est une démonstration, aucune commande réelle n'a été passée.</p>
+    <a href="carte.html" class="btn-primary" style="margin-top:26px; display:inline-block; background:var(--confiture); color:var(--mie);">Retour à la carte</a>
+  </div>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="logo">Le Grand Opéra</div>
+    <div class="footlinks">
+      <a href="carte.html">Carte</a>
+      <a href="apropos.html">L'établissement</a>
+      <a href="equipe.html">Équipe</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div>© 2026 — 13 Rue de Mogador, 75009 Paris</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/auth.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/products.js"></script>
+<script>
+  async function renderCart(){
+    PRODUCTS = await loadProducts();
+    const cart = getCart();
+    const contentEl = document.getElementById('cart-content');
+    const checkoutForm = document.getElementById('checkout-form');
+
+    if (cart.length === 0) {
+      contentEl.innerHTML = `<div class="empty-cart">Votre panier est vide. <a href="carte.html" style="color:var(--confiture); font-weight:600;">Voir la carte</a></div>`;
+      checkoutForm.classList.remove('open');
+      return;
+    }
+
+    let linesHtml = '';
+    cart.forEach(item => {
+      const p = PRODUCTS.find(prod => prod.id === item.id);
+      if (!p) return;
+      const unitPrice = parsePrice(p.price);
+      linesHtml += `
+        <div class="cart-line">
+          <img src="${p.image}" alt="${p.name}">
+          <div class="cart-line-info">
+            <h3>${p.name}</h3>
+            <div class="unit-price">${p.price} / unité</div>
+          </div>
+          <div class="qty-control">
+            <button class="qty-btn" data-action="dec" data-id="${p.id}">−</button>
+            <span class="qty-val">${item.qty}</span>
+            <button class="qty-btn" data-action="inc" data-id="${p.id}">+</button>
+          </div>
+          <div class="line-total">${(unitPrice * item.qty).toFixed(2).replace('.', ',')} €</div>
+          <span class="remove-btn" data-action="remove" data-id="${p.id}">Retirer</span>
+        </div>`;
+    });
+
+    const total = cartTotal();
+    contentEl.innerHTML = linesHtml + `
+      <div class="cart-summary">
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>${total.toFixed(2).replace('.', ',')} €</span>
+        </div>
+      </div>`;
+
+    contentEl.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = Number(btn.dataset.id);
+        const cart = getCart();
+        const item = cart.find(i => i.id === id);
+        if (btn.dataset.action === 'inc') updateCartQty(id, item.qty + 1);
+        if (btn.dataset.action === 'dec') updateCartQty(id, item.qty - 1);
+        if (btn.dataset.action === 'remove') removeFromCart(id);
+        renderCart();
+      });
+    });
+
+    checkoutForm.classList.add('open');
+  }
+
+  document.getElementById('confirm-order').addEventListener('click', () => {
+    const name = document.getElementById('pickup-name').value;
+    const time = document.getElementById('pickup-time').value;
+    if (!name || !time) {
+      alert('Merci de renseigner votre nom et une heure de retrait.');
+      return;
+    }
+    const orderNumber = 'DEMO-' + Math.floor(100000 + Math.random() * 900000);
+    document.getElementById('order-number').textContent = orderNumber;
+    document.getElementById('cart-content').style.display = 'none';
+    document.getElementById('checkout-form').style.display = 'none';
+    document.getElementById('success-box').classList.add('open');
+    clearCart();
+  });
+
+  renderCart();
+</script>
+</body>
+</html>

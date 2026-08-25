@@ -28,6 +28,14 @@ nav.wrap{display:flex; align-items:center; justify-content:space-between; height
 .navlinks a:hover::after, .navlinks a.active::after{width:100%;}
 .navlinks a.active{color:var(--confiture);}
 .navcta{background:var(--croute); color:var(--mie); padding:10px 20px; border-radius:2px; font-size:13px; font-weight:600; letter-spacing:.03em;}
+.cart-link{position:relative; display:flex; align-items:center; padding:6px;}
+.cart-link svg{width:22px; height:22px; stroke:var(--croute);}
+.cart-badge{
+  position:absolute; top:-2px; right:-2px; background:var(--confiture); color:var(--farine);
+  font-size:10px; font-weight:700; width:17px; height:17px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; display:none;
+}
+.nav-right{display:flex; align-items:center; gap:16px;}
 @media (max-width:960px){ .navlinks{display:none;} }
 
 /* PAGE HERO (sub-pages, shorter than home) */
