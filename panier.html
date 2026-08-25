@@ -9,12 +9,10 @@
 <link rel="stylesheet" href="css/style.css">
 <style>
   .cart-wrap{max-width:720px; margin:0 auto; padding:70px 28px 100px;}
-  .demo-banner{
-    background:rgba(200,155,60,0.12); border:1px solid rgba(200,155,60,0.35);
-    border-radius:6px; padding:14px 18px; font-size:13px; color:var(--croute);
-    margin-bottom:32px; display:flex; gap:10px; align-items:flex-start;
+  .demo-note{
+    font-size:11.5px; color:rgba(43,29,20,0.4); text-align:center;
+    margin-bottom:28px; letter-spacing:.01em;
   }
-  .demo-banner svg{width:18px; height:18px; flex-shrink:0; margin-top:1px; stroke:var(--ble);}
   .cart-line{
     display:flex; align-items:center; gap:16px; padding:18px 0; border-bottom:1px solid var(--line);
   }
@@ -34,6 +32,11 @@
   .summary-row{display:flex; justify-content:space-between; font-size:15px; margin-bottom:8px;}
   .summary-row.total{font-family:'Big Shoulders Display'; font-size:24px; margin-top:14px;}
   .empty-cart{text-align:center; padding:60px 20px; color:rgba(43,29,20,0.5);}
+  .login-required{
+    text-align:center; padding:30px 20px; background:var(--mie); border:1px solid var(--line);
+    border-radius:6px; margin-top:24px;
+  }
+  .login-required p{color:rgba(43,29,20,0.65); font-size:14.5px; margin-bottom:16px;}
   .checkout-form{margin-top:36px; display:none;}
   .checkout-form.open{display:block;}
   .success-box{display:none; text-align:center; padding:50px 20px;}
@@ -74,12 +77,14 @@
 
 <div class="cart-wrap">
 
-  <div class="demo-banner">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v5M12 16h.01"/></svg>
-    <div>Ceci est une commande de démonstration réalisée dans le cadre d'un projet de stage. Aucun paiement réel n'est effectué et aucune commande n'est transmise à l'établissement.</div>
-  </div>
+  <p class="demo-note">Démonstration réalisée dans le cadre d'un projet de stage — aucun paiement ni commande réelle.</p>
 
   <div id="cart-content"></div>
+
+  <div id="login-required" class="login-required" style="display:none;">
+    <p>Connecte-toi pour valider ta commande.</p>
+    <a href="compte.html" class="btn-primary" style="background:var(--confiture); color:var(--mie); display:inline-block;">Se connecter / Créer un compte</a>
+  </div>
 
   <div class="checkout-form" id="checkout-form">
     <h2 style="font-size:22px; text-transform:none; font-family:'Newsreader',serif; font-style:italic; font-weight:500; margin-bottom:16px;">Retrait en boutique</h2>
@@ -98,7 +103,7 @@
     <div class="check">✓</div>
     <h2 style="font-size:26px; text-transform:none; font-family:'Newsreader',serif; font-style:italic; font-weight:500;">Commande simulée confirmée</h2>
     <p style="margin-top:10px; color:rgba(43,29,20,0.65);">Numéro de démonstration : <strong id="order-number"></strong></p>
-    <p style="margin-top:6px; font-size:13px; color:rgba(43,29,20,0.5);">Rappel : ceci est une démonstration, aucune commande réelle n'a été passée.</p>
+    <p style="margin-top:6px; font-size:11.5px; color:rgba(43,29,20,0.4);">Démonstration — aucune commande réelle n'a été passée.</p>
     <a href="carte.html" class="btn-primary" style="margin-top:26px; display:inline-block; background:var(--confiture); color:var(--mie);">Retour à la carte</a>
   </div>
 
@@ -128,10 +133,12 @@
     const cart = getCart();
     const contentEl = document.getElementById('cart-content');
     const checkoutForm = document.getElementById('checkout-form');
+    const loginRequired = document.getElementById('login-required');
 
     if (cart.length === 0) {
       contentEl.innerHTML = `<div class="empty-cart">Votre panier est vide. <a href="carte.html" style="color:var(--confiture); font-weight:600;">Voir la carte</a></div>`;
       checkoutForm.classList.remove('open');
+      loginRequired.style.display = 'none';
       return;
     }
 
@@ -179,9 +186,23 @@
     });
 
     checkoutForm.classList.add('open');
+
+    const user = await getCurrentUser();
+    if (user) {
+      loginRequired.style.display = 'none';
+      checkoutForm.style.display = 'block';
+    } else {
+      loginRequired.style.display = 'block';
+      checkoutForm.style.display = 'none';
+    }
   }
 
-  document.getElementById('confirm-order').addEventListener('click', () => {
+  document.getElementById('confirm-order').addEventListener('click', async () => {
+    const user = await getCurrentUser();
+    if (!user) {
+      alert('Merci de te connecter avant de valider la commande.');
+      return;
+    }
     const name = document.getElementById('pickup-name').value;
     const time = document.getElementById('pickup-time').value;
     if (!name || !time) {
