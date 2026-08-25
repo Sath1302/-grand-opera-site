@@ -20,6 +20,7 @@
       <a href="equipe.html">Notre équipe</a>
       <a href="galerie.html">Galerie</a>
       <a href="contact.html" class="active">Contact</a>
+      <a href="commandes.html">Mes commandes</a>
     </div>
     <div class="nav-right">
       <a href="panier.html" class="cart-link"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-badge" id="cart-badge">0</span></a>
@@ -65,6 +66,31 @@
   </div>
 </section>
 
+<section class="tight" style="background:var(--mie); border-top:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Un message</div>
+      <h2>Nous écrire</h2>
+    </div>
+    <form id="contact-form" style="max-width:520px;">
+      <div class="field" style="margin-bottom:16px;">
+        <label style="display:block; font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--confiture); margin-bottom:7px;">Nom</label>
+        <input type="text" id="contact-name" required style="width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:5px; font-family:'Work Sans'; font-size:15px;">
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label style="display:block; font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--confiture); margin-bottom:7px;">Email</label>
+        <input type="email" id="contact-email" required style="width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:5px; font-family:'Work Sans'; font-size:15px;">
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label style="display:block; font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--confiture); margin-bottom:7px;">Message</label>
+        <textarea id="contact-message" required rows="4" style="width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:5px; font-family:'Work Sans'; font-size:15px; resize:vertical;"></textarea>
+      </div>
+      <button type="submit" class="btn-primary" style="background:var(--confiture); color:var(--mie);">Envoyer</button>
+      <div id="contact-msg" style="margin-top:14px; font-size:13.5px; display:none;"></div>
+    </form>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
     <div class="logo">Le Grand Opéra</div>
@@ -74,6 +100,7 @@
       <a href="equipe.html">Équipe</a>
       <a href="galerie.html">Galerie</a>
       <a href="contact.html">Contact</a>
+      <a href="commandes.html">Mes commandes</a>
     </div>
     <div>© 2026 — 13 Rue de Mogador, 75009 Paris</div>
   </div>
@@ -81,5 +108,24 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/auth.js"></script>
 <script src="js/cart.js"></script>
+<script>
+  document.getElementById('contact-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('contact-name').value;
+    const email = document.getElementById('contact-email').value;
+    const message = document.getElementById('contact-message').value;
+    const msgEl = document.getElementById('contact-msg');
+    const { error } = await sb.from('messages').insert({ name, email, message });
+    if (error) {
+      msgEl.textContent = "Une erreur est survenue, merci de réessayer.";
+      msgEl.style.color = 'var(--confiture)';
+    } else {
+      msgEl.textContent = "Message envoyé, merci !";
+      msgEl.style.color = '#3f6b3d';
+      document.getElementById('contact-form').reset();
+    }
+    msgEl.style.display = 'block';
+  });
+</script>
 </body>
 </html>

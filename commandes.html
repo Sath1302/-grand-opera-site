@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes commandes — Le Grand Opéra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;800&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .orders-wrap{max-width:680px; margin:0 auto; padding:70px 28px 100px;}
+  .order-card{background:var(--mie); border:1px solid var(--line); border-radius:6px; padding:22px 26px; margin-bottom:18px;}
+  .order-card-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px;}
+  .order-card-head .num{font-family:'Big Shoulders Display'; font-size:18px; color:var(--confiture);}
+  .order-card-head .date{font-size:12px; color:rgba(43,29,20,0.5);}
+  .order-line{display:flex; justify-content:space-between; font-size:13.5px; color:rgba(43,29,20,0.7); padding:4px 0;}
+  .order-total{display:flex; justify-content:space-between; font-weight:700; margin-top:10px; padding-top:10px; border-top:1px solid var(--line); font-size:15px;}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <a href="index.html" class="logo">Le Grand<span> Opéra</span></a>
+    <div class="navlinks">
+      <a href="index.html">Accueil</a>
+      <a href="carte.html">Notre carte</a>
+      <a href="apropos.html">L'établissement</a>
+      <a href="equipe.html">Notre équipe</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="nav-right">
+      <a href="panier.html" class="cart-link"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-badge" id="cart-badge">0</span></a>
+      <span id="nav-auth-slot"></span>
+    </div>
+  </nav>
+</header>
+
+<section class="page-hero" style="padding-bottom:0;">
+  <div class="page-hero-bg"><img src="assets/patisseries-3.png" alt="Le Grand Opéra"></div>
+  <div class="wrap">
+    <div class="eyebrow">Historique</div>
+    <h1>Mes commandes</h1>
+  </div>
+</section>
+
+<div class="orders-wrap" id="orders-wrap">
+  <p style="text-align:center; color:rgba(43,29,20,0.5);">Chargement…</p>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="logo">Le Grand Opéra</div>
+    <div class="footlinks">
+      <a href="carte.html">Carte</a>
+      <a href="apropos.html">L'établissement</a>
+      <a href="equipe.html">Équipe</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div>© 2026 — 13 Rue de Mogador, 75009 Paris</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/auth.js"></script>
+<script src="js/cart.js"></script>
+<script>
+  async function loadOrders(){
+    const wrap = document.getElementById('orders-wrap');
+    const user = await getCurrentUser();
+    if (!user) {
+      wrap.innerHTML = `<div style="text-align:center; padding:30px; background:var(--mie); border:1px solid var(--line); border-radius:6px;">
+        <p style="margin-bottom:16px; color:rgba(43,29,20,0.65);">Connecte-toi pour voir tes commandes.</p>
+        <a href="compte.html" class="btn-primary" style="background:var(--confiture); color:var(--mie); display:inline-block;">Se connecter</a>
+      </div>`;
+      return;
+    }
+
+    const { data: orders, error } = await sb.from('orders').select('*').order('created_at', { ascending: false });
+    if (error || !orders || orders.length === 0) {
+      wrap.innerHTML = `<p style="text-align:center; color:rgba(43,29,20,0.5);">Aucune commande pour le moment. <a href="carte.html" style="color:var(--confiture); font-weight:600;">Voir la carte</a></p>`;
+      return;
+    }
+
+    let html = '';
+    for (const order of orders) {
+      const { data: items } = await sb.from('order_items').select('*').eq('order_id', order.id);
+      const date = new Date(order.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      let linesHtml = (items || []).map(item =>
+        `<div class="order-line"><span>${item.qty} × ${item.product_name}</span><span>${(item.unit_price * item.qty).toFixed(2).replace('.', ',')} €</span></div>`
+      ).join('');
+      html += `
+        <div class="order-card">
+          <div class="order-card-head">
+            <span class="num">${order.order_number}</span>
+            <span class="date">${date}</span>
+          </div>
+          ${linesHtml}
+          <div class="order-total"><span>Total</span><span>${order.total.toFixed(2).replace('.', ',')} €</span></div>
+          <p style="font-size:11.5px; color:rgba(43,29,20,0.4); margin-top:10px;">Retrait prévu à ${order.pickup_time} au nom de ${order.pickup_name} — démonstration.</p>
+        </div>`;
+    }
+    wrap.innerHTML = html;
+  }
+  loadOrders();
+</script>
+</body>
+</html>

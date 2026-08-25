@@ -21,11 +21,20 @@ async function loadProducts(){
 async function initProductGrid(filtersId, gridId, opts = {}){
   const { limit = null, withFilters = true } = opts;
   let activeFilter = "Tous";
+  let searchTerm = "";
   const filtersEl = document.getElementById(filtersId);
   const gridEl = document.getElementById(gridId);
+  const searchEl = document.getElementById('product-search');
 
   gridEl.innerHTML = `<p style="grid-column:1/-1; color:rgba(247,242,231,0.5); font-size:14px;">Chargement de la carte…</p>`;
   PRODUCTS = await loadProducts();
+
+  if (searchEl) {
+    searchEl.addEventListener('input', () => {
+      searchTerm = searchEl.value.trim().toLowerCase();
+      renderGrid();
+    });
+  }
 
   function renderFilters(){
     if (!withFilters || !filtersEl) return;
@@ -43,7 +52,12 @@ async function initProductGrid(filtersId, gridId, opts = {}){
 
   function renderGrid(){
     let items = activeFilter === "Tous" ? PRODUCTS : PRODUCTS.filter(p => p.category === activeFilter);
+    if (searchTerm) items = items.filter(p => p.name.toLowerCase().includes(searchTerm));
     if (limit) items = items.slice(0, limit);
+    if (items.length === 0) {
+      gridEl.innerHTML = `<p style="grid-column:1/-1; color:rgba(247,242,231,0.5); font-size:14px;">Aucun produit ne correspond à ta recherche.</p>`;
+      return;
+    }
     gridEl.innerHTML = items.map(p => `
       <div class="p-card" data-id="${p.id}" role="button" tabindex="0">
         <div class="thumb"><img src="${p.image}" alt="${p.name}"></div>
@@ -83,6 +97,7 @@ function ensureModal(){
         <div class="price" id="modal-price"></div>
         <p id="modal-desc"></p>
         <button class="btn-primary" id="modal-add-cart" style="margin-top:20px; width:100%; background:var(--confiture); color:var(--mie);">Ajouter au panier</button>
+        <div id="modal-reviews" style="margin-top:26px; border-top:1px solid var(--line); padding-top:20px;"></div>
       </div>
     </div>`;
   document.body.appendChild(modal);
@@ -113,6 +128,59 @@ function openProductModal(id){
     addBtn.textContent = 'Ajouté ✓';
     setTimeout(() => { addBtn.textContent = 'Ajouter au panier'; }, 1200);
   };
+
+  loadReviews(id);
+}
+
+async function loadReviews(productId){
+  const container = document.getElementById('modal-reviews');
+  container.innerHTML = `<p style="font-size:12.5px; color:rgba(43,29,20,0.4);">Chargement des avis…</p>`;
+
+  const { data: reviews } = await sb.from('reviews').select('*').eq('product_id', productId).order('created_at', { ascending: false });
+  const user = await getCurrentUser();
+
+  let avgHtml = '';
+  if (reviews && reviews.length > 0) {
+    const avg = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
+    avgHtml = `<div style="font-size:14px; font-weight:600; margin-bottom:12px;">★ ${avg} <span style="font-weight:400; color:rgba(43,29,20,0.5); font-size:12.5px;">(${reviews.length} avis)</span></div>`;
+  }
+
+  let listHtml = (reviews || []).map(r => `
+    <div style="padding:10px 0; border-bottom:1px solid var(--line); font-size:13px;">
+      <div style="color:var(--ble);">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+      ${r.comment ? `<p style="margin-top:4px; color:rgba(43,29,20,0.7);">${r.comment}</p>` : ''}
+      <div style="font-size:11px; color:rgba(43,29,20,0.4); margin-top:3px;">${r.user_email.split('@')[0]}</div>
+    </div>
+  `).join('');
+
+  let formHtml = '';
+  if (user) {
+    formHtml = `
+      <div style="margin-top:14px;">
+        <select id="review-rating" style="padding:8px; border-radius:5px; border:1px solid var(--line); font-size:13px;">
+          <option value="5">★★★★★</option>
+          <option value="4">★★★★☆</option>
+          <option value="3">★★★☆☆</option>
+          <option value="2">★★☆☆☆</option>
+          <option value="1">★☆☆☆☆</option>
+        </select>
+        <input type="text" id="review-comment" placeholder="Ton avis (optionnel)" style="width:100%; margin-top:8px; padding:9px 12px; border-radius:5px; border:1px solid var(--line); font-size:13px; font-family:'Work Sans';">
+        <button id="submit-review" style="margin-top:8px; background:var(--croute); color:var(--mie); border:none; padding:9px 16px; border-radius:4px; font-size:12.5px; cursor:pointer;">Publier l'avis</button>
+      </div>`;
+  } else {
+    formHtml = `<p style="font-size:12px; color:rgba(43,29,20,0.45); margin-top:10px;"><a href="compte.html" style="color:var(--confiture); font-weight:600;">Connecte-toi</a> pour laisser un avis.</p>`;
+  }
+
+  container.innerHTML = `<h4 style="font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--confiture); margin-bottom:10px;">Avis clients</h4>` + avgHtml + (listHtml || `<p style="font-size:12.5px; color:rgba(43,29,20,0.45);">Aucun avis pour l'instant.</p>`) + formHtml;
+
+  if (user) {
+    document.getElementById('submit-review').addEventListener('click', async () => {
+      const rating = Number(document.getElementById('review-rating').value);
+      const comment = document.getElementById('review-comment').value;
+      await sb.from('reviews').insert({ product_id: productId, user_id: user.id, user_email: user.email, rating, comment });
+      loadReviews(productId);
+    });
+  }
 }
 
 function closeProductModal(){
