@@ -73,7 +73,8 @@
           <label for="login-password">Mot de passe</label>
           <input type="password" id="login-password" required autocomplete="current-password">
         </div>
-        <button type="submit" class="btn-primary auth-submit" style="background:var(--confiture); color:var(--farine);">Se connecter</button>
+        <div class="h-captcha" data-sitekey="812ecdb0-bed6-4da8-bbd2-18bee5a29880" data-callback="onLoginCaptcha"></div>
+        <button type="submit" class="btn-primary auth-submit" style="background:var(--confiture); color:var(--farine); margin-top:16px;">Se connecter</button>
         <div class="auth-msg" id="login-msg"></div>
       </form>
     </div>
@@ -88,11 +89,10 @@
           <label for="signup-password">Mot de passe</label>
           <input type="password" id="signup-password" required minlength="6" autocomplete="new-password">
         </div>
-        <div class="h-captcha" data-sitekey="PASTE_HCAPTCHA_SITEKEY_HERE"></div>
+        <div class="h-captcha" data-sitekey="812ecdb0-bed6-4da8-bbd2-18bee5a29880" data-callback="onSignupCaptcha"></div>
         <button type="submit" class="btn-primary auth-submit" style="background:var(--confiture); color:var(--farine); margin-top:16px;">Créer mon compte</button>
         <div class="auth-msg" id="signup-msg"></div>
       </form>
-      <p class="captcha-note">Un email de confirmation peut être demandé selon la configuration du compte.</p>
     </div>
   </div>
 
@@ -150,12 +150,23 @@
   }
   refreshAccountView();
 
+  let loginCaptchaToken = null;
+  let signupCaptchaToken = null;
+  function onLoginCaptcha(token){ loginCaptchaToken = token; }
+  function onSignupCaptcha(token){ signupCaptchaToken = token; }
+
   // Connexion
   document.getElementById('form-login').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
-    const { error } = await signIn(email, password);
+    if (!loginCaptchaToken) {
+      showMsg('login-msg', 'Merci de valider le CAPTCHA.', 'error');
+      return;
+    }
+    const { error } = await signIn(email, password, loginCaptchaToken);
+    if (window.hcaptcha) hcaptcha.reset();
+    loginCaptchaToken = null;
     if (error) {
       showMsg('login-msg', error.message, 'error');
     } else {
@@ -170,7 +181,13 @@
     e.preventDefault();
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
-    const { error } = await signUp(email, password);
+    if (!signupCaptchaToken) {
+      showMsg('signup-msg', 'Merci de valider le CAPTCHA.', 'error');
+      return;
+    }
+    const { error } = await signUp(email, password, signupCaptchaToken);
+    if (window.hcaptcha) hcaptcha.reset();
+    signupCaptchaToken = null;
     if (error) {
       showMsg('signup-msg', error.message, 'error');
     } else {

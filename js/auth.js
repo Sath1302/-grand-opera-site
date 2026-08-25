@@ -7,15 +7,21 @@ const SUPABASE_KEY = "sb_publishable_BZCj24P97-VAjqfiKzJmCQ_dcAFRoSm";
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Inscription
-async function signUp(email, password) {
-  const { data, error } = await sb.auth.signUp({ email, password });
+// Inscription (captchaToken requis si le CAPTCHA est activé côté Supabase)
+async function signUp(email, password, captchaToken) {
+  const { data, error } = await sb.auth.signUp({
+    email, password,
+    options: { captchaToken }
+  });
   return { data, error };
 }
 
-// Connexion
-async function signIn(email, password) {
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+// Connexion (captchaToken requis si le CAPTCHA est activé côté Supabase)
+async function signIn(email, password, captchaToken) {
+  const { data, error } = await sb.auth.signInWithPassword({
+    email, password,
+    options: { captchaToken }
+  });
   return { data, error };
 }
 
