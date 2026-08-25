@@ -21,7 +21,7 @@
       <a href="galerie.html">Galerie</a>
       <a href="contact.html">Contact</a>
     </div>
-    <a href="contact.html" class="navcta">Nous trouver</a>
+    <span id="nav-auth-slot"></span>
   </nav>
 </header>
 
@@ -38,7 +38,13 @@
   <div class="wrap">
     <div class="filters" id="filters"></div>
     <div class="grid4" id="product-grid"></div>
-    <p class="data-note">Clique sur un produit pour voir sa fiche détail. Les produits sont générés à partir d'une structure de données JS partagée entre les pages (<code>js/products.js</code> : tableau d'objets nom / catégorie / prix / description / image). Cette architecture sépare les données de l'affichage, comme le ferait une base de données, tout en restant compatible avec un hébergement statique (GitHub Pages).</p>
+    <p style="margin-top:32px; font-size:13px; color:rgba(247,242,231,0.45);">Clique sur un produit pour voir sa fiche détail.</p>
+    <!-- Note technique pour le rapport de stage : les produits sont générés à partir d'une
+         structure de données JS partagée entre les pages (js/products.js : tableau d'objets
+         nom / catégorie / prix / description / image). Cette architecture sépare les données
+         de l'affichage, comme le ferait une base de données, tout en restant compatible avec
+         un hébergement statique (GitHub Pages). -->
+
   </div>
 </section>
 
@@ -60,5 +66,7 @@
 <script>
   initProductGrid('filters', 'product-grid');
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/auth.js"></script>
 </body>
 </html>

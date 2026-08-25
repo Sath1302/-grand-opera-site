@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon compte — Le Grand Opéra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;600;800&family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .auth-wrap{max-width:440px; margin:0 auto; padding:80px 28px 100px;}
+  .auth-tabs{display:flex; gap:8px; margin-bottom:32px; background:var(--mie); border:1px solid var(--line); border-radius:8px; padding:5px;}
+  .auth-tab{flex:1; text-align:center; padding:11px; border-radius:6px; font-size:13.5px; font-weight:600; cursor:pointer; color:rgba(43,29,20,0.55);}
+  .auth-tab.active{background:var(--croute); color:var(--farine);}
+  .auth-panel{display:none;}
+  .auth-panel.active{display:block;}
+  .field{margin-bottom:18px;}
+  .field label{display:block; font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--confiture); margin-bottom:7px;}
+  .field input{width:100%; padding:13px 14px; border:1px solid var(--line); border-radius:5px; font-family:'Work Sans'; font-size:15px; background:var(--mie); color:var(--croute);}
+  .field input:focus{outline:2px solid var(--ble); outline-offset:1px;}
+  .auth-submit{width:100%; margin-top:8px;}
+  .auth-msg{margin-top:16px; padding:12px 14px; border-radius:5px; font-size:13.5px; display:none;}
+  .auth-msg.error{display:block; background:rgba(122,36,52,0.1); border:1px solid rgba(122,36,52,0.3); color:var(--confiture);}
+  .auth-msg.success{display:block; background:rgba(76,140,74,0.1); border:1px solid rgba(76,140,74,0.3); color:#3f6b3d;}
+  .captcha-note{font-size:12px; color:rgba(43,29,20,0.5); margin-top:14px; text-align:center;}
+  .account-card{background:var(--mie); border:1px solid var(--line); border-radius:8px; padding:36px;}
+  .account-card h2{font-size:26px; text-transform:none; font-family:'Newsreader',serif; font-style:italic; font-weight:500;}
+  .account-card p{margin-top:10px; color:rgba(43,29,20,0.65); font-size:14.5px;}
+  .logout-btn{margin-top:24px;}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap">
+    <a href="index.html" class="logo">Le Grand<span> Opéra</span></a>
+    <div class="navlinks">
+      <a href="index.html">Accueil</a>
+      <a href="carte.html">Notre carte</a>
+      <a href="apropos.html">L'établissement</a>
+      <a href="equipe.html">Notre équipe</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <span id="nav-auth-slot"></span>
+  </nav>
+</header>
+
+<section class="page-hero" style="padding-bottom:0;">
+  <div class="page-hero-bg"><img src="assets/facade.png" alt="Façade du Grand Opéra"></div>
+  <div class="wrap">
+    <div class="eyebrow">Espace client</div>
+    <h1>Mon compte</h1>
+  </div>
+</section>
+
+<div class="auth-wrap">
+
+  <!-- Vue non connecté -->
+  <div id="auth-forms">
+    <div class="auth-tabs">
+      <div class="auth-tab active" data-tab="login">Connexion</div>
+      <div class="auth-tab" data-tab="signup">Créer un compte</div>
+    </div>
+
+    <div class="auth-panel active" id="panel-login">
+      <form id="form-login">
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="login-password">Mot de passe</label>
+          <input type="password" id="login-password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-primary auth-submit" style="background:var(--confiture); color:var(--farine);">Se connecter</button>
+        <div class="auth-msg" id="login-msg"></div>
+      </form>
+    </div>
+
+    <div class="auth-panel" id="panel-signup">
+      <form id="form-signup">
+        <div class="field">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" required autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="signup-password">Mot de passe</label>
+          <input type="password" id="signup-password" required minlength="6" autocomplete="new-password">
+        </div>
+        <div class="h-captcha" data-sitekey="PASTE_HCAPTCHA_SITEKEY_HERE"></div>
+        <button type="submit" class="btn-primary auth-submit" style="background:var(--confiture); color:var(--farine); margin-top:16px;">Créer mon compte</button>
+        <div class="auth-msg" id="signup-msg"></div>
+      </form>
+      <p class="captcha-note">Un email de confirmation peut être demandé selon la configuration du compte.</p>
+    </div>
+  </div>
+
+  <!-- Vue connecté -->
+  <div id="auth-account" style="display:none;">
+    <div class="account-card">
+      <h2 id="account-email"></h2>
+      <p>Vous êtes connecté à votre espace Le Grand Opéra.</p>
+      <button class="btn-ghost logout-btn" id="btn-logout" style="border-color:var(--confiture); color:var(--confiture); background:none;">Se déconnecter</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="logo">Le Grand Opéra</div>
+    <div class="footlinks">
+      <a href="carte.html">Carte</a>
+      <a href="apropos.html">L'établissement</a>
+      <a href="equipe.html">Équipe</a>
+      <a href="galerie.html">Galerie</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div>© 2026 — 13 Rue de Mogador, 75009 Paris</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+<script src="js/auth.js"></script>
+<script>
+  // Bascule entre les onglets Connexion / Créer un compte
+  document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  function showMsg(id, text, type){
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = 'auth-msg ' + type;
+  }
+
+  // Affiche soit les formulaires, soit la vue "connecté"
+  async function refreshAccountView(){
+    const user = await getCurrentUser();
+    document.getElementById('auth-forms').style.display = user ? 'none' : 'block';
+    document.getElementById('auth-account').style.display = user ? 'block' : 'none';
+    if (user) document.getElementById('account-email').textContent = user.email;
+  }
+  refreshAccountView();
+
+  // Connexion
+  document.getElementById('form-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const { error } = await signIn(email, password);
+    if (error) {
+      showMsg('login-msg', error.message, 'error');
+    } else {
+      showMsg('login-msg', 'Connexion réussie !', 'success');
+      await refreshAccountView();
+      updateNavAuthState();
+    }
+  });
+
+  // Inscription
+  document.getElementById('form-signup').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const { error } = await signUp(email, password);
+    if (error) {
+      showMsg('signup-msg', error.message, 'error');
+    } else {
+      showMsg('signup-msg', 'Compte créé ! Vous pouvez maintenant vous connecter.', 'success');
+      await refreshAccountView();
+      updateNavAuthState();
+    }
+  });
+
+  // Déconnexion
+  document.getElementById('btn-logout').addEventListener('click', signOut);
+</script>
+</body>
+</html>
